@@ -1,19 +1,22 @@
-const hre = require("hardhat");
+require("dotenv").config();
+const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying PEPE Staking Contract...");
+    const pepeTokenAddress = "0xf8FAbd399e2E3B57761929d04d5eEdA13bcA43a5";  // 🟢 Ganti dengan alamat PEPE token
+    const usdtTokenAddress = "0x55d398326f99059ff775485246999027b3197955"; // 🟢 Ganti dengan alamat USDT token
 
-  const pepeTokenAddress = "0xf8FAbd399e2E3B57761929d04d5eEdA13bcA43a5"; // GANTI DENGAN ALAMAT TOKEN PEPE YANG SUDAH DEPLOY
-  
-  const PEPEStaking = await hre.ethers.getContractFactory("PEPEStaking");
-  const pepeStaking = await PEPEStaking.deploy(pepeTokenAddress);
+    console.log("🚀 Deploying PEPE Staking Contract...");
 
-  await pepeStaking.waitForDeployment();
+    const StakingFactory = await ethers.getContractFactory("PEPEStaking");
+    const stakingContract = await StakingFactory.deploy(pepeTokenAddress, usdtTokenAddress);
 
-  console.log(`✅ PEPE Staking successfully deployed to: ${await pepeStaking.getAddress()}`);
+    await stakingContract.waitForDeployment();
+    const stakingAddress = await stakingContract.getAddress();
+
+    console.log(`✅ PEPE Staking successfully deployed to: ${stakingAddress}`);
 }
 
 main().catch((error) => {
-  console.error("❌ Deployment failed:", error);
-  process.exitCode = 1;
+    console.error("❌ Deployment failed:", error);
+    process.exit(1);
 });

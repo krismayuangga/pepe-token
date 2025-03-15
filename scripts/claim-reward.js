@@ -1,22 +1,28 @@
-const { ethers } = require("hardhat");
+require("dotenv").config();
+const { ethers } = require("ethers");
+
+// Koneksi ke BSC Testnet
+const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+// Alamat kontrak
+const stakingContractAddress = "0x9CbB706643394f6E606dbDc2C2C889cD37783d2A";
+const stakingAbi = require("../abi/stakingAbi.json");
+
+// Buat instance kontrak
+const stakingContract = new ethers.Contract(stakingContractAddress, stakingAbi, wallet);
 
 async function main() {
-  const stakingContractAddress = "0xf3C3EC727F0645C40b799Cba144e45ed16831a93"; // Ganti dengan alamat terbaru jika berubah
-  const [deployer] = await ethers.getSigners();
-
-  console.log(`🚀 Mengklaim reward untuk alamat: ${deployer.address}`);
-
-  const staking = await ethers.getContractAt("PEPEStaking", stakingContractAddress);
-
-  const tx = await staking.claimRewards();
-  console.log("⏳ Memproses transaksi...");
-  
-  await tx.wait();
-
-  console.log("✅ Reward berhasil diklaim!");
+    try {
+        console.log(`🚀 Mengklaim reward untuk: ${wallet.address}`);
+        
+        const tx = await stakingContract.claimRewards();
+        await tx.wait();
+        
+        console.log(`✅ Reward berhasil diklaim! TX: ${tx.hash}`);
+    } catch (error) {
+        console.error("❌ ERROR: Gagal klaim reward:", error);
+    }
 }
 
-main().catch((error) => {
-  console.error("❌ Error:", error);
-  process.exit(1);
-});
+main();

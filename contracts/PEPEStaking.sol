@@ -6,7 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract PEPEStaking is Ownable {
     IERC20 public pepeToken;
-    uint256 public rewardRate = 1e16; // 0.01 PEPE per second
+    IERC20 public usdtToken;
+
+    uint256 public rewardRate = 1e16; // 0.01 USDT per second per PEPE
 
     struct Stake {
         uint256 amount;
@@ -18,9 +20,11 @@ contract PEPEStaking is Ownable {
     event Staked(address indexed user, uint256 amount);
     event Unstaked(address indexed user, uint256 amount);
     event RewardsClaimed(address indexed user, uint256 reward);
+    event USDTAdded(address indexed admin, uint256 amount);
 
-    constructor(address _pepeToken) Ownable(msg.sender) {
+    constructor(address _pepeToken, address _usdtToken) Ownable(msg.sender) {
         pepeToken = IERC20(_pepeToken);
+        usdtToken = IERC20(_usdtToken);
     }
 
     function stake(uint256 _amount) external {
@@ -38,20 +42,31 @@ contract PEPEStaking is Ownable {
 
     function calculateReward(address _staker) public view returns (uint256) {
         Stake memory stakeData = stakes[_staker];
-        if (stakeData.amount == 0) {
-            return 0;
-        }
+        if (stakeData.amount == 0) return 0;
+
         uint256 stakingDuration = block.timestamp - stakeData.startTime;
         uint256 reward = (stakeData.amount * stakingDuration * rewardRate) / 1e18;
         return reward;
+    }
+
+    function addUSDT(uint256 _amount) external onlyOwner {
+        require(usdtToken.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+        emit USDTAdded(msg.sender, _amount);
+    }
+
+    function getUSDTBalance() external view returns (uint256) {
+        return usdtToken.balanceOf(address(this));
     }
 
     function claimRewards() external {
         uint256 reward = calculateReward(msg.sender);
         require(reward > 0, "No rewards available");
 
+        uint256 contractBalance = usdtToken.balanceOf(address(this));
+        require(contractBalance >= reward, "Insufficient USDT in contract");
+
         stakes[msg.sender].startTime = block.timestamp;
-        pepeToken.transfer(msg.sender, reward);
+        require(usdtToken.transfer(msg.sender, reward), "USDT transfer failed");
 
         emit RewardsClaimed(msg.sender, reward);
     }
@@ -65,7 +80,8 @@ contract PEPEStaking is Ownable {
 
         delete stakes[msg.sender];
 
-        pepeToken.transfer(msg.sender, amountToUnstake + reward);
+        require(pepeToken.transfer(msg.sender, amountToUnstake), "PEPE transfer failed");
+        require(usdtToken.transfer(msg.sender, reward), "USDT transfer failed");
 
         emit Unstaked(msg.sender, amountToUnstake);
         emit RewardsClaimed(msg.sender, reward);
