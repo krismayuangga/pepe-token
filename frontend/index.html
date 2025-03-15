@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPE Staking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.3.0/ethers.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>PEPE Staking</h1>
+        <button id="connectWallet">🔗 Connect Wallet</button>
+        <p><strong>Wallet:</strong> <span id="walletAddress">Not Connected</span></p>
+        <p><strong>Staked:</strong> <span id="stakedAmount">0 PEPE</span></p>
+        <p><strong>Rewards:</strong> <span id="rewardAmount">0 PEPE</span></p>
+        
+        <input type="number" id="stakeAmount" placeholder="Amount to Stake">
+        <button id="stakeButton">💎 Stake</button>
+        <button id="unstakeButton">🚀 Unstake</button>
+        <button id="claimReward">💰 Claim Rewards</button>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
