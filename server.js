@@ -15,15 +15,17 @@ if (!process.env.RPC_URL || !process.env.PRIVATE_KEY) {
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-// ✅ Pastikan alamat kontrak sesuai
+// ✅ Alamat Kontrak Terbaru
 const pepeTokenAddress = "0xf8FAbd399e2E3B57761929d04d5eEdA13bcA43a5"; // PEPE Token Address
-const stakingContractAddress = "0x9CbB706643394f6E606dbDc2C2C889cD37783d2A"; // Staking Contract Address
+const stakingContractAddress = "0xaCEbb39ae24f9d83B173b8448020a62a8B8E47fE"; // ✅ Staking Contract Address Terbaru
+const usdtAddress = "0xaaE4d34B027Cd3e38e7f8238f681bD798acA00F7"; // ✅ Dummy USDT Contract Address
 
 // ✅ Load ABI dengan pengecekan error
-let pepeTokenAbi, stakingAbi;
+let pepeTokenAbi, stakingAbi, usdtAbi;
 try {
     pepeTokenAbi = JSON.parse(fs.readFileSync("./abi/pepeTokenAbi.json", "utf8"));
     stakingAbi = JSON.parse(fs.readFileSync("./abi/stakingAbi.json", "utf8"));
+    usdtAbi = JSON.parse(fs.readFileSync("./abi/usdtAbi.json", "utf8"));
 } catch (error) {
     console.error("❌ ERROR: Gagal memuat file ABI. Pastikan folder 'abi/' ada dan berisi file yang benar.");
     process.exit(1);
@@ -32,6 +34,7 @@ try {
 // ✅ Buat instance kontrak
 const pepeToken = new ethers.Contract(pepeTokenAddress, pepeTokenAbi, wallet);
 const stakingContract = new ethers.Contract(stakingContractAddress, stakingAbi, wallet);
+const usdtContract = new ethers.Contract(usdtAddress, usdtAbi, wallet);
 
 // 🚀 Buat Express Server
 const app = express();
@@ -52,7 +55,18 @@ app.get("/check-network", async (req, res) => {
     }
 });
 
-// 📌 Cek Saldo Staking Contract
+// 📌 Cek Saldo USDT di Staking Contract
+app.get("/staking-usdt-balance", async (req, res) => {
+    try {
+        const balance = await usdtContract.balanceOf(stakingContractAddress);
+        res.json({ success: true, balance: ethers.formatUnits(balance, 18) });
+    } catch (error) {
+        console.error("❌ ERROR: Gagal mendapatkan saldo USDT:", error);
+        res.status(500).json({ success: false, error: "Gagal mendapatkan saldo USDT" });
+    }
+});
+
+// 📌 Cek Saldo PEPE di Staking Contract
 app.get("/staking-balance", async (req, res) => {
     try {
         const balance = await pepeToken.balanceOf(stakingContractAddress);

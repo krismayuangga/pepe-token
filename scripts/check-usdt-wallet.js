@@ -19,7 +19,7 @@ const usdtAbi = [
 ];
 
 // Alamat kontrak USDT di BSC Testnet
-const USDT_ADDRESS = "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"; 
+const USDT_ADDRESS = "0xaaE4d34B027Cd3e38e7f8238f681bD798acA00F7"; 
 const usdtContract = new ethers.Contract(USDT_ADDRESS, usdtAbi, provider);
 
 // Fungsi untuk mengecek saldo USDT di wallet

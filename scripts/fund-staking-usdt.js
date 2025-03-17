@@ -7,8 +7,8 @@ const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 // **Alamat Kontrak USDT & Staking**
-const USDT_ADDRESS = "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"; // USDT BEP20 di BSC Testnet
-const STAKING_CONTRACT_ADDRESS = "0x9CbB706643394f6E606dbDc2C2C889cD37783d2A"; // Update dengan alamat staking terbaru
+const USDT_ADDRESS = "0xaaE4d34B027Cd3e38e7f8238f681bD798acA00F7"; // USDT BEP20 di BSC Testnet
+const STAKING_CONTRACT_ADDRESS = "0xaCEbb39ae24f9d83B173b8448020a62a8B8E47fE"; // Update dengan alamat staking terbaru
 
 // **Load ABI dari file JSON**
 const usdtAbi = JSON.parse(fs.readFileSync("./abi/usdtAbi.json", "utf8"));

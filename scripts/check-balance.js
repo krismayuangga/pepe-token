@@ -8,7 +8,7 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 // ✅ Alamat Kontrak
 const pepeTokenAddress = "0xf8FAbd399e2E3B57761929d04d5eEdA13bcA43a5";
-const stakingContractAddress = "0x9CbB706643394f6E606dbDc2C2C889cD37783d2A";
+const stakingContractAddress = "0xaCEbb39ae24f9d83B173b8448020a62a8B8E47fE";
 
 // ✅ Load ABI
 const pepeTokenAbi = JSON.parse(fs.readFileSync("./abi/pepeTokenAbi.json", "utf8"));
